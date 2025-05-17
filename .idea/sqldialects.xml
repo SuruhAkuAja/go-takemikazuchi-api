@@ -2,15 +2,6 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/Database Console.sql" dialect="MySQL" />
-    <file url="file://$PROJECT_DIR$/migrations/20250105144212_create_table_user_addresses.up.sql" dialect="MySQL" />
-    <file url="file://$PROJECT_DIR$/migrations/20250105144213_create_table_jobs.up.sql" dialect="MySQL" />
-    <file url="file://$PROJECT_DIR$/migrations/20250107163841_create_table_transactions.down.sql" dialect="MySQL" />
-    <file url="file://$PROJECT_DIR$/migrations/20250107163841_create_table_transactions.up.sql" dialect="MySQL" />
-    <file url="file://$PROJECT_DIR$/migrations/20250108123454_create_table_job_applications.up.sql" dialect="MySQL" />
-    <file url="file://$PROJECT_DIR$/migrations/20250110093049_create_table_job_resources.up.sql" dialect="MySQL" />
-    <file url="file://$PROJECT_DIR$/migrations/20250120075050_create_table_worker_resources.down.sql" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/migrations/20250120075050_create_table_worker_resources.up.sql" dialect="MySQL" />
-    <file url="file://$PROJECT_DIR$/migrations/20250124093843_create_table_reviews.down.sql" dialect="MySQL" />
     <file url="PROJECT" dialect="MySQL" />
   </component>
 </project>
