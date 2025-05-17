@@ -98,12 +98,15 @@ func (userService *ServiceImpl) HandleGenerateOneTimePassword(generateOneTimePas
 
 		projectRoot, _ := os.Getwd() // Mendapatkan root path proyek
 		templateFile := fmt.Sprintf("%s/public/static/email_template.html", projectRoot)
-		err = userService.mailerService.SendEmail(
-			generateOneTimePassDto.Email,
-			"One Time Verification Token",
-			templateFile,
-			emailPayload)
-		helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrBadRequest, err))
+		fmt.Println(generateOneTimePassDto)
+		go func() {
+			err = userService.mailerService.SendEmail(
+				generateOneTimePassDto.Email,
+				"One Time Verification Token",
+				templateFile,
+				emailPayload)
+			helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrBadRequest, err))
+		}()
 		return nil
 	})
 }
