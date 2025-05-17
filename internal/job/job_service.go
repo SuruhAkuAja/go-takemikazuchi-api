@@ -12,4 +12,5 @@ type Service interface {
 	HandleUpdate(userJwtClaims *userDto.JwtClaimDto, jobId string, updateJobDto *dto.UpdateJobDto, uploadedFiles []*multipart.FileHeader)
 	HandleDelete(userJwtClaims *userDto.JwtClaimDto, jobId string) *exception.ClientError
 	HandleRequestCompleted(userJwtClaims *userDto.JwtClaimDto, jobId *string)
+	HandleFindAll() []*dto.JobResponseDto
 }

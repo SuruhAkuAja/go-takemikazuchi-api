@@ -63,6 +63,18 @@ func NewService(
 		workerRepository:      workerRepository}
 }
 
+func (jobService *ServiceImpl) HandleFindAll() []*jobDto.JobResponseDto {
+
+	var jobResponses []*jobDto.JobResponseDto
+	err := jobService.dbConnection.Transaction(func(gormTransaction *gorm.DB) error {
+		jobModels := jobService.jobRepository.FindAll(gormTransaction)
+		jobResponses = mapper.MapJobModelIntoJobResponseDto(jobModels)
+		return nil
+	})
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusInternalServerError, exception.ErrInternalServerError, err))
+	return jobResponses
+}
+
 func (jobService *ServiceImpl) HandleCreate(userJwtClaims *userDto.JwtClaimDto, createJobDto *jobDto.CreateJobDto, uploadedFiles []*multipart.FileHeader) *exception.ClientError {
 	err := jobService.validatorService.ValidateStruct(createJobDto)
 	jobService.validatorService.ParseValidationError(err)

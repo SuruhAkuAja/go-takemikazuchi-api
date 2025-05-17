@@ -12,7 +12,17 @@ type RepositoryImpl struct{}
 func NewRepository() *RepositoryImpl {
 	return &RepositoryImpl{}
 }
-
+func (jobRepository *RepositoryImpl) FindAll(gormTransaction *gorm.DB) []*model.Job {
+	var jobModels []*model.Job
+	err := gormTransaction.Model(model.Job{}).
+		Preload("User").
+		Preload("Category").
+		Joins("JOIN users ON users.id = jobs.user_id").
+		Joins("JOIN categories ON categories.id = jobs.category_id").
+		Find(&jobModels).Error
+	helper.CheckErrorOperation(err, exception.ParseGormError(err))
+	return jobModels
+}
 func (jobRepository *RepositoryImpl) FindById(gormTransaction *gorm.DB, id *uint64) (*model.Job, error) {
 	var jobModel model.Job
 	err := gormTransaction.Model(model.Job{}).Where("id = ?", *id).First(&jobModel).Error

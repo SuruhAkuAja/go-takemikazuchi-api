@@ -36,8 +36,8 @@ var routeSet = wire.NewSet(
 	ProvideProtectedRoutes,
 )
 
-func ProvidePublicRoutes(routerGroup *gin.RouterGroup, transactionController transactionFeature.Controller) *routes.PublicRoutes {
-	publicRoutes := routes.NewPublicRoutes(routerGroup, transactionController)
+func ProvidePublicRoutes(routerGroup *gin.RouterGroup, transactionController transactionFeature.Controller, jobController jobFeature.Controller) *routes.PublicRoutes {
+	publicRoutes := routes.NewPublicRoutes(routerGroup, transactionController, jobController)
 	publicRoutes.Setup()
 	return publicRoutes
 }

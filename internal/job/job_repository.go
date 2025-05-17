@@ -15,4 +15,5 @@ type Repository interface {
 	IsExists(jobId uint64, gormTransaction *gorm.DB) bool
 	VerifyJobOwner(gormTransaction *gorm.DB, userEmail *string, jobId *uint64) (bool, error)
 	VerifyJobWorker(gormTransaction *gorm.DB, userEmail *string, jobId *uint64) (bool, error)
+	FindAll(gormTransaction *gorm.DB) []*model.Job
 }

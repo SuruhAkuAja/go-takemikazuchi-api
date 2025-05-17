@@ -42,21 +42,21 @@ func InitializeRoutes(ginRouterGroup *gin.RouterGroup, dbConnection *gorm.DB, va
 	job_applicationRepositoryImpl := job_application.NewRepository()
 	serviceImpl := transaction.NewService(validatorInstance, engTranslator, dbConnection, midtransClient, repositoryImpl, transactionRepositoryImpl, job_applicationRepositoryImpl, viperConfig)
 	handler := transaction.NewHandler(serviceImpl)
-	publicRoutes := ProvidePublicRoutes(ginRouterGroup, handler)
-	validatorServiceImpl := validator2.NewService(validatorInstance, engTranslator)
 	userRepositoryImpl := user.NewRepository()
-	userServiceImpl := user.NewService(validatorServiceImpl, userRepositoryImpl, dbConnection, mailerService, identityProvider, viperConfig)
-	userHandler := user.NewHandler(userServiceImpl, validatorInstance)
-	authenticationRoutes := ProvideAuthenticationRoutes(ginRouterGroup, userHandler)
 	categoryRepositoryImpl := category.NewRepository()
-	categoryServiceImpl := category.NewService(categoryRepositoryImpl, dbConnection, validatorServiceImpl)
-	categoryHandler := category.NewHandler(categoryServiceImpl)
 	job_resourceRepositoryImpl := job_resource.NewRepository()
 	fileStorage := storage.ProvideFileStorage(viperConfig)
 	user_addressRepositoryImpl := user_address.NewUserAddressRepository()
 	workerRepositoryImpl := worker.NewRepository()
+	validatorServiceImpl := validator2.NewService(validatorInstance, engTranslator)
 	jobServiceImpl := job.NewService(repositoryImpl, userRepositoryImpl, categoryRepositoryImpl, job_resourceRepositoryImpl, dbConnection, fileStorage, googleMapsClient, user_addressRepositoryImpl, workerRepositoryImpl, validatorServiceImpl)
 	jobHandler := job.NewHandler(jobServiceImpl)
+	publicRoutes := ProvidePublicRoutes(ginRouterGroup, handler, jobHandler)
+	userServiceImpl := user.NewService(validatorServiceImpl, userRepositoryImpl, dbConnection, mailerService, identityProvider, viperConfig)
+	userHandler := user.NewHandler(userServiceImpl, validatorInstance)
+	authenticationRoutes := ProvideAuthenticationRoutes(ginRouterGroup, userHandler)
+	categoryServiceImpl := category.NewService(categoryRepositoryImpl, dbConnection, validatorServiceImpl)
+	categoryHandler := category.NewHandler(categoryServiceImpl)
 	job_applicationServiceImpl := job_application.NewService(validatorInstance, engTranslator, job_applicationRepositoryImpl, dbConnection, repositoryImpl, userRepositoryImpl, validatorServiceImpl)
 	job_applicationHandler := job_application.NewHandler(job_applicationServiceImpl)
 	worker_walletRepositoryImpl := worker_wallet.NewRepository()
@@ -86,8 +86,8 @@ var routeSet = wire.NewSet(
 	ProvideProtectedRoutes,
 )
 
-func ProvidePublicRoutes(routerGroup *gin.RouterGroup, transactionController transaction.Controller) *routes.PublicRoutes {
-	publicRoutes := routes.NewPublicRoutes(routerGroup, transactionController)
+func ProvidePublicRoutes(routerGroup *gin.RouterGroup, transactionController transaction.Controller, jobController job.Controller) *routes.PublicRoutes {
+	publicRoutes := routes.NewPublicRoutes(routerGroup, transactionController, jobController)
 	publicRoutes.Setup()
 	return publicRoutes
 }

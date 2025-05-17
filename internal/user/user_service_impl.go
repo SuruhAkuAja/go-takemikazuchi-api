@@ -166,6 +166,8 @@ func (userService *ServiceImpl) HandleLogin(loginUserDto *dto.LoginUserDto) stri
 		tokenInstance := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 			"email":        userModel.Email,
 			"phone_number": helper.ParseNullableValue(userModel.PhoneNumber),
+			"user_id":      userModel.ID,
+			"role":         userModel.Role,
 			"exp":          time.Now().Add(time.Hour * 72).Unix(),
 		})
 		tokenString, err = tokenInstance.SignedString([]byte(userService.viperConfig.GetString("JWT_SECRET")))

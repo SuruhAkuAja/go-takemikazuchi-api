@@ -20,6 +20,10 @@ func NewHandler(jobService Service) *Handler {
 	}
 }
 
+func (jobHandler *Handler) FindAll(ginContext *gin.Context) {
+	operationResult := jobHandler.jobService.HandleFindAll()
+	ginContext.JSON(http.StatusOK, helper.WriteSuccess("Success", operationResult))
+}
 func (jobHandler *Handler) Create(ginContext *gin.Context) {
 	var createJobDto jobDto.CreateJobDto
 	err := ginContext.ShouldBind(&createJobDto)

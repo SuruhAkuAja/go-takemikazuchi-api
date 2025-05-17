@@ -35,6 +35,7 @@ func (dbConn *DatabaseConnection) GetDatabaseConnection() *gorm.DB {
 		gormOpen, err := gorm.Open(sqlDialect, &gorm.Config{})
 		dbConn.databaseInstance = gormOpen
 		if err != nil {
+			fmt.Println(err)
 			panic(err)
 		}
 	}
