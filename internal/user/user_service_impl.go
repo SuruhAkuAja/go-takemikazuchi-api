@@ -168,6 +168,7 @@ func (userService *ServiceImpl) HandleLogin(loginUserDto *dto.LoginUserDto) stri
 			"phone_number": helper.ParseNullableValue(userModel.PhoneNumber),
 			"user_id":      userModel.ID,
 			"role":         userModel.Role,
+			"name":         userModel.Name,
 			"exp":          time.Now().Add(time.Hour * 72).Unix(),
 		})
 		tokenString, err = tokenInstance.SignedString([]byte(userService.viperConfig.GetString("JWT_SECRET")))
