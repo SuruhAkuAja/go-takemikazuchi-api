@@ -33,6 +33,7 @@ func MapJobApplicationModelIntoJobApplicationResponse(jobApplicationsModel []mod
 	for _, jobApplicationModel := range jobApplicationsModel {
 		var jobApplicationResponseDto jobApplicationDto.JobApplicationResponseDto
 		jobApplicationResponseDto.Id = strconv.FormatUint(jobApplicationModel.ID, 10)
+
 		jobApplicationResponseDto.FullName = jobApplicationModel.User.Name
 		jobApplicationResponseDto.AppliedAt = jobApplicationModel.CreatedAt.Format(time.RFC3339)
 		jobApplicationsResponse = append(jobApplicationsResponse, &jobApplicationResponseDto)

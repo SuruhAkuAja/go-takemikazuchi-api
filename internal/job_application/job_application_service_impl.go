@@ -85,7 +85,7 @@ func (jobApplicationService *ServiceImpl) SelectApplication(userJwtClaims *userD
 	err := jobApplicationService.validatorService.ValidateStruct(selectApplicationDto)
 	jobApplicationService.validatorService.ParseValidationError(err)
 	err = jobApplicationService.dbConnection.Transaction(func(gormTransaction *gorm.DB) error {
-		jobApplicationModel := jobApplicationService.jobApplicationRepository.FindById(gormTransaction, &selectApplicationDto.UserId, &selectApplicationDto.JobId)
+		jobApplicationModel := jobApplicationService.jobApplicationRepository.FindById(gormTransaction, &selectApplicationDto.Id, &selectApplicationDto.JobId)
 		id, err := jobApplicationService.jobRepository.FindVerifyById(gormTransaction, userJwtClaims.Email, &selectApplicationDto.JobId)
 		helper.CheckErrorOperation(err, exception.ParseGormError(err))
 		jobModel := id
