@@ -29,3 +29,8 @@ func (userRepository *RepositoryImpl) FindUserByEmail(userEmail *string, userMod
 	err := gormConnection.Where("email = ?", userEmail).First(userModel).Error
 	helper.CheckErrorOperation(err, exception.ParseGormError(err))
 }
+
+func (userRepository *RepositoryImpl) DynamicUpdate(gormTransaction *gorm.DB, whereClause interface{}, updatedValue interface{}, whereArgument ...interface{}) {
+	err := gormTransaction.Model(&model.Worker{}).Debug().Where(whereClause, whereArgument).Updates(updatedValue).Error
+	helper.CheckErrorOperation(err, exception.ParseGormError(err))
+}

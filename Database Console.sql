@@ -33,6 +33,8 @@ SET role = 'Admin'
 WHERE id = 8;
 SELECT *
 FROM workers;
+SELECT *
+FROM users;
 
 DELETE
 FROM workers;
