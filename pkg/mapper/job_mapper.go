@@ -48,6 +48,8 @@ func MapJobModelIntoJobResponseDto(jobModel []*model.Job) []*dto.JobResponseDto 
 		jobResponse.Title = job.Title
 		jobResponse.Description = job.Description
 		jobResponse.CategoryName = job.Category.Name
+		jobResponse.Price = job.Price
+		jobResponse.Status = job.Status
 		jobResponse.CreatedAt = job.CreatedAt.Format(time.RFC3339)
 		jobResponse.UpdatedAt = job.UpdatedAt.Format(time.RFC3339)
 		jobResponseDto = append(jobResponseDto, &jobResponse)

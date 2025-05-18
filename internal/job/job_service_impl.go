@@ -77,6 +77,7 @@ func (jobService *ServiceImpl) HandleFindAll() []*jobDto.JobResponseDto {
 		jobResponses = mapper.MapJobModelIntoJobResponseDto(jobModels)
 		return nil
 	})
+	fmt.Println(jobResponses)
 	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusInternalServerError, exception.ErrInternalServerError, err))
 	return jobResponses
 }
