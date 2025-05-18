@@ -13,4 +13,5 @@ type Service interface {
 	HandleDelete(userJwtClaims *userDto.JwtClaimDto, jobId string) *exception.ClientError
 	HandleRequestCompleted(userJwtClaims *userDto.JwtClaimDto, jobId *string)
 	HandleFindAll() []*dto.JobResponseDto
+	HandleFindById(jobId uint64) (*dto.JobResponseDto, error)
 }

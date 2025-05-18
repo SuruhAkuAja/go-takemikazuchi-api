@@ -1,6 +1,7 @@
 package mapper
 
 import (
+	"fmt"
 	"github.com/go-viper/mapstructure/v2"
 	"go-takemikazuchi-api/internal/job/dto"
 	jobApplicationDto "go-takemikazuchi-api/internal/job_application/dto"
@@ -56,5 +57,25 @@ func MapJobModelIntoJobResponseDto(jobModel []*model.Job) []*dto.JobResponseDto 
 		jobResponseDto = append(jobResponseDto, &jobResponse)
 	}
 	return jobResponseDto
+}
 
+func MapSingleJobModelIntoSingleJobResponseDto(jobModel *model.Job) *dto.JobResponseDto {
+	var jobResponse dto.JobResponseDto
+	jobResponse.ID = jobModel.ID
+	jobResponse.Title = jobModel.Title
+	jobResponse.Description = jobModel.Description
+	jobResponse.CategoryName = jobModel.Category.Name
+	jobResponse.Price = jobModel.Price
+	jobResponse.Status = jobModel.Status
+	jobResponse.CreatedAt = jobModel.CreatedAt.Format(time.RFC3339)
+	jobResponse.UpdatedAt = jobModel.UpdatedAt.Format(time.RFC3339)
+	fmt.Println("Before Mapping User")
+	jobResponse.User = MapUserModelIntoUserDto(jobModel.User)
+	fmt.Println("Before Mapping User Address")
+	jobResponse.UserAddress = MapUserAddressModelIntoUserAddressDto(jobModel.UserAddress)
+	if jobModel.Worker != nil {
+		fmt.Println("Before Mapping Worker")
+		jobResponse.Worker = MapWorkerModelIntoWorkerResponseDto(jobModel.Worker)
+	}
+	return &jobResponse
 }

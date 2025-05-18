@@ -24,6 +24,20 @@ func (jobHandler *Handler) FindAll(ginContext *gin.Context) {
 	operationResult := jobHandler.jobService.HandleFindAll()
 	ginContext.JSON(http.StatusOK, helper.WriteSuccess("Success", operationResult))
 }
+
+func (jobHandler *Handler) FindById(ginContext *gin.Context) {
+	jobId := ginContext.Param("jobId")
+	// Convert jobId to uint64
+	jobIdUint64, err := helper.ConvertStringToUint64(jobId)
+	if err != nil {
+		exception.ThrowClientError(exception.NewClientError(http.StatusBadRequest, exception.ErrBadRequest, err))
+		return
+	}
+	operationResult, err := jobHandler.jobService.HandleFindById(jobIdUint64)
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrBadRequest, err))
+	ginContext.JSON(http.StatusOK, helper.WriteSuccess("Success", operationResult))
+}
+
 func (jobHandler *Handler) Create(ginContext *gin.Context) {
 	var createJobDto jobDto.CreateJobDto
 	err := ginContext.ShouldBind(&createJobDto)

@@ -25,7 +25,18 @@ func (jobRepository *RepositoryImpl) FindAll(gormTransaction *gorm.DB) []*model.
 }
 func (jobRepository *RepositoryImpl) FindById(gormTransaction *gorm.DB, id *uint64) (*model.Job, error) {
 	var jobModel model.Job
-	err := gormTransaction.Model(model.Job{}).Where("id = ?", *id).First(&jobModel).Error
+	err := gormTransaction.Model(model.Job{}).
+		Preload("User").
+		Preload("Category").
+		Preload("Worker").
+		Preload("UserAddress").
+		Joins("LEFT JOIN users ON users.id = jobs.user_id").
+		Joins("LEFT JOIN categories ON categories.id = jobs.category_id").
+		Joins("LEFT JOIN workers ON workers.id = jobs.worker_id").
+		Joins("LEFT JOIN user_addresses ON user_addresses.id = jobs.address_id").
+		Where("jobs.id = ?", *id).
+		Select("*").
+		First(&jobModel).Error
 	if err != nil {
 		return nil, err
 	}

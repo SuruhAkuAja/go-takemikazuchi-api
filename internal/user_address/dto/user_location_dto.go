@@ -18,6 +18,24 @@ type UserLocation struct {
 	BoundingBox []string    `json:"boundingbox"`
 }
 
+type UserAddressResponse struct {
+	ID                    uint64  `json:"id"`
+	PlaceId               string  `json:"place_id"`
+	UserId                uint64  `json:"user_id"`
+	FormattedAddress      string  `json:"formatted_address"`
+	AdditionalInformation string  `json:"additional_information"`
+	StreetNumber          string  `json:"street_number"`
+	Route                 string  `json:"route"`
+	Village               string  `json:"village"`
+	District              string  `json:"district"`
+	City                  string  `json:"city"`
+	Province              string  `json:"province"`
+	Country               string  `json:"country"`
+	PostalCode            string  `json:"postal_code"`
+	Latitude              float64 `json:"latitude"`
+	Longitude             float64 `json:"longitude"`
+}
+
 type UserAddress struct {
 	Industrial  string `json:"industrial"`
 	Suburb      string `json:"suburb"`

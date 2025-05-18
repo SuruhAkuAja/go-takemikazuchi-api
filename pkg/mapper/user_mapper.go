@@ -72,3 +72,12 @@ func MapReverseGeocodingIntoUserAddresses(geocodingResult *maps.GeocodingResult,
 		}
 	}
 }
+
+func MapUserModelIntoUserDto(userModel *model.User) *dto.UserResponseDto {
+	var userDto dto.UserResponseDto
+	err := mapstructure.Decode(userModel, &userDto)
+	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrBadRequest, err))
+	userDto.CreatedAt = userModel.CreatedAt.Format("2006-01-02 15:04:05")
+	userDto.UpdatedAt = userModel.UpdatedAt.Format("2006-01-02 15:04:05")
+	return &userDto
+}

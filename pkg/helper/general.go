@@ -52,3 +52,11 @@ func GenerateOneTimePasswordToken() string {
 	num := rand.Intn(9000) + 1000
 	return strconv.Itoa(num)
 }
+
+func ConvertStringToUint64(id string) (uint64, error) {
+	idUint64, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("failed to convert string to uint64: %w", err)
+	}
+	return idUint64, nil
+}

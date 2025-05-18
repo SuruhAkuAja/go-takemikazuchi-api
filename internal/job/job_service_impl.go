@@ -82,6 +82,21 @@ func (jobService *ServiceImpl) HandleFindAll() []*jobDto.JobResponseDto {
 	return jobResponses
 }
 
+func (jobService *ServiceImpl) HandleFindById(jobId uint64) (*jobDto.JobResponseDto, error) {
+	err := jobService.validatorService.ValidateVar(jobId, "required|gt=0")
+	jobService.validatorService.ParseValidationError(err)
+	var jobResponse *jobDto.JobResponseDto
+	err = jobService.dbConnection.Transaction(func(gormTransaction *gorm.DB) error {
+		jobModel, err := jobService.jobRepository.FindById(gormTransaction, &jobId)
+		fmt.Println(jobModel.UserAddress, jobModel.AddressId)
+		helper.CheckErrorOperation(err, exception.ParseGormError(err))
+		jobResponse = mapper.MapSingleJobModelIntoSingleJobResponseDto(jobModel)
+		return nil
+	})
+	helper.CheckErrorOperation(err, exception.ParseGormError(err))
+	return jobResponse, nil
+}
+
 func (jobService *ServiceImpl) HandleCreate(userJwtClaims *userDto.JwtClaimDto, createJobDto *jobDto.CreateJobDto, uploadedFiles []*multipart.FileHeader) *exception.ClientError {
 	err := jobService.validatorService.ValidateStruct(createJobDto)
 	jobService.validatorService.ParseValidationError(err)

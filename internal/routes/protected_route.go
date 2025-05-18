@@ -57,6 +57,7 @@ func (protectedRoutes *ProtectedRoutes) Setup() {
 	categoryRouterGroup.DELETE("/:id", protectedRoutes.categoryController.Delete)
 
 	jobRouterGroup := protectedRoutes.routerGroup.Group("jobs")
+	jobRouterGroup.GET("/:jobId", protectedRoutes.jobController.FindById)
 	jobRouterGroup.POST("", protectedRoutes.jobController.Create)
 	jobRouterGroup.PUT("/:jobId", protectedRoutes.jobController.Update)
 	jobRouterGroup.POST("/completed/:jobId", protectedRoutes.jobController.RequestCompleted)
