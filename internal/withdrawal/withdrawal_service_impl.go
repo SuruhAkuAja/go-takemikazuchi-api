@@ -65,8 +65,12 @@ func (withdrawalService *ServiceImpl) Create(userJwtClaims *userDto.JwtClaimDto,
 		var userModel model.User
 		withdrawalService.userRepository.FindUserByEmail(userJwtClaims.Email, &userModel, gormTransaction)
 		workerModel, err := withdrawalService.workerRepository.FindById(gormTransaction, &userModel.ID)
+
 		helper.CheckErrorOperation(err, exception.ParseGormError(err))
-		withdrawalService.walletRepository.FindById(gormTransaction, &createWithdrawalDto.WalletId)
+		workerWallet, err := withdrawalService.walletRepository.FindById(gormTransaction, &createWithdrawalDto.WalletId)
+		if workerWallet.Balance < float64(createWithdrawalDto.Amount) {
+			exception.ThrowClientError(exception.NewClientError(http.StatusBadRequest, exception.ErrBadRequest, errors.New("not enough revenue")))
+		}
 		mapper.MapCreateWithdrawalDtoIntoWithdrawalModel(createWithdrawalDto, &withdrawalModel)
 		withdrawalModel.WorkerId = workerModel.ID
 		withdrawalService.withdrawalRepository.Create(gormTransaction, &withdrawalModel)

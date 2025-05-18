@@ -73,7 +73,7 @@ func (workerService *ServiceImpl) Create(userJwtClaim *userDto.JwtClaimDto, crea
 		identityCardPath := fmt.Sprintf("%s-%s-%s", uuidString, "identityCard", createWorkerWalletDocumentDto.IdentityCard.Filename)
 		workerService.userRepository.DynamicUpdate(gormTransaction, "id = ?", map[string]interface{}{
 			"role": "Worker",
-		})
+		}, workerModel.ID)
 		workerService.fileStorage.UploadFile(driverLicenseFile, driverLicensePath)
 		workerService.fileStorage.UploadFile(policeCertificateFile, policeCertificatePath)
 		workerService.fileStorage.UploadFile(identityCardFile, identityCardPath)

@@ -16,6 +16,7 @@ import (
 	"go-takemikazuchi-api/internal/model"
 	"go-takemikazuchi-api/internal/transaction/dto"
 	userDto "go-takemikazuchi-api/internal/user/dto"
+	workerWallet "go-takemikazuchi-api/internal/worker_wallet"
 	"go-takemikazuchi-api/pkg/exception"
 	"go-takemikazuchi-api/pkg/helper"
 	"go-takemikazuchi-api/pkg/mapper"
@@ -33,6 +34,7 @@ type ServiceImpl struct {
 	jobApplicationRepository jobApplication.Repository
 	transactionRepository    Repository
 	viperConfig              *viper.Viper
+	workerWalletRepository   workerWallet.Repository
 }
 
 func NewService(
@@ -44,6 +46,7 @@ func NewService(
 	transactionRepository Repository,
 	jobApplicationRepository jobApplication.Repository,
 	viperConfig *viper.Viper,
+	workerWalletRepository workerWallet.Repository,
 ) *ServiceImpl {
 	return &ServiceImpl{
 		validatorInstance:        validatorInstance,
@@ -54,6 +57,7 @@ func NewService(
 		transactionRepository:    transactionRepository,
 		viperConfig:              viperConfig,
 		jobApplicationRepository: jobApplicationRepository,
+		workerWalletRepository:   workerWalletRepository,
 	}
 }
 
@@ -116,6 +120,14 @@ func (transactionService *ServiceImpl) PostPayment(transactionNotificationDto *d
 		transactionModel.PaymentMethod = &transactionNotificationDto.PaymentType
 		transactionService.transactionRepository.Update(gormTransaction, transactionModel)
 		transactionService.jobRepository.Update(transactionModel.Job, gormTransaction)
+		workerWalletModel, err := transactionService.workerWalletRepository.FindByWorkerId(gormTransaction, transactionModel.Job.WorkerId)
+		helper.CheckErrorOperation(err, exception.ParseGormError(err))
+		if transactionModel.Status == "Completed" {
+			workerWalletModel.Balance = workerWalletModel.Balance + transactionModel.Amount
+			transactionService.workerWalletRepository.DynamicUpdate(gormTransaction, "id = ?", map[string]interface{}{
+				"balance": workerWalletModel.Balance,
+			}, workerWalletModel.ID)
+		}
 		return nil
 	})
 	helper.CheckErrorOperation(err, exception.ParseGormError(err))

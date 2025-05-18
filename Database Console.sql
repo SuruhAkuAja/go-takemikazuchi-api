@@ -55,3 +55,6 @@ FROM users
          LEFT JOIN workers ON workers.id = jobs.worker_id
          LEFT JOIN user_addresses ON user_addresses.id = jobs.address_id
 WHERE jobs.id = 7;
+
+SELECT *
+FROM worker_wallets;
