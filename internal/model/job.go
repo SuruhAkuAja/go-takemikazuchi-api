@@ -10,7 +10,7 @@ type Job struct {
 	UserId         uint64           `gorm:"column:user_id"`
 	AddressId      uint64           `gorm:"column:address_id"`
 	CategoryId     uint64           `gorm:"column:category_id" mapstructure:"CategoryId"`
-	WorkerId       uint64           `gorm:"column:worker_id" mapstructure:"WorkerId"`
+	WorkerId       *uint64          `gorm:"column:worker_id" mapstructure:"WorkerId"`
 	Title          string           `gorm:"column:title" mapstructure:"Title"`
 	Description    string           `gorm:"column:description" mapstructure:"Description"`
 	Price          float64          `gorm:"column:price" mapstructure:"Price"`

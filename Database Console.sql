@@ -13,6 +13,7 @@ SELECT * FROM users;
 SELECT * FROM withdrawals;
 SELECT * FROM orders;
 SELECT * FROM transactions;
+SELECT * FROM categories;
 UPDATE users SET role = 'Admin' WHERE id = 8;
 DELETE FROM workers;
 DELETE FROM worker_resources;

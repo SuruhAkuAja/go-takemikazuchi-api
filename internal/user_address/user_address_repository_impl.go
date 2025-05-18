@@ -1,6 +1,7 @@
 package user_address
 
 import (
+	"fmt"
 	"go-takemikazuchi-api/internal/model"
 	"go-takemikazuchi-api/pkg/exception"
 	"go-takemikazuchi-api/pkg/helper"
@@ -21,5 +22,6 @@ func (userAddressRepository *RepositoryImpl) FindById(gormTransaction *gorm.DB, 
 
 func (userAddressRepository *RepositoryImpl) Store(gormTransaction *gorm.DB, userAddress *model.UserAddress) {
 	err := gormTransaction.Create(userAddress).Error
+	fmt.Println("Category", err)
 	helper.CheckErrorOperation(err, exception.ParseGormError(err))
 }

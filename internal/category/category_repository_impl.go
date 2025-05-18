@@ -18,7 +18,6 @@ func (categoryRepository *RepositoryImpl) FindAll(gormTransaction *gorm.DB) []mo
 	var categoriesModel []model.Category
 	err := gormTransaction.
 		Preload("Jobs").
-		Joins("JOIN jobs ON categories.id = jobs.category_id").
 		Find(&categoriesModel).Error
 	helper.CheckErrorOperation(err, exception.ParseGormError(err))
 	return categoriesModel

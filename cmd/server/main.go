@@ -55,6 +55,8 @@ func main() {
 	rootRouterGroup := ginEngine.Group("/")
 	midtransService := configs.NewMidtransService(viperConfig)
 	midtransClient := midtransService.InitializeMidtransConfiguration()
+	nominatimBaseUrl := viperConfig.GetString("NOMINATIM_BASE_URL")
+	nominatimHttpClient := configs.NewHttpClient(nil, &nominatimBaseUrl)
 	_, initRoutesError := injection.InitializeRoutes(
 		rootRouterGroup,
 		databaseConnection,
@@ -65,6 +67,7 @@ func main() {
 		identityProvider,
 		googleMapsClient,
 		midtransClient,
+		nominatimHttpClient,
 	)
 	if initRoutesError != nil {
 		panic(initRoutesError)

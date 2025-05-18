@@ -57,6 +57,12 @@ migration-up:
 migration-down:
 	$(MIGRATE_COMMAND) -database "$(url)" -path ./migrations down
 
+migration-up-one:
+	$(MIGRATE_COMMAND) -database "$(url)" -path ./migrations up 1
+
+migration-down-one:
+	$(MIGRATE_COMMAND) -database "$(url)" -path ./migrations down 1
+
 migration-create:
 	$(MIGRATE_COMMAND) create -ext sql -dir ./migrations $(name)
 

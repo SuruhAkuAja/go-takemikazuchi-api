@@ -36,7 +36,7 @@ import (
 // Injectors from injector.go:
 
 // wire.go
-func InitializeRoutes(ginRouterGroup *gin.RouterGroup, dbConnection *gorm.DB, validatorInstance *validator.Validate, engTranslator ut.Translator, viperConfig *viper.Viper, mailerService *configs.MailerService, identityProvider *configs.IdentityProvider, googleMapsClient *maps.Client, midtransClient *snap.Client) (*routes.ApplicationRoutes, error) {
+func InitializeRoutes(ginRouterGroup *gin.RouterGroup, dbConnection *gorm.DB, validatorInstance *validator.Validate, engTranslator ut.Translator, viperConfig *viper.Viper, mailerService *configs.MailerService, identityProvider *configs.IdentityProvider, googleMapsClient *maps.Client, midtransClient *snap.Client, nominatimHttpClient *configs.HttpClient) (*routes.ApplicationRoutes, error) {
 	repositoryImpl := job.NewRepository()
 	transactionRepositoryImpl := transaction.NewRepository()
 	job_applicationRepositoryImpl := job_application.NewRepository()
@@ -49,7 +49,7 @@ func InitializeRoutes(ginRouterGroup *gin.RouterGroup, dbConnection *gorm.DB, va
 	user_addressRepositoryImpl := user_address.NewUserAddressRepository()
 	workerRepositoryImpl := worker.NewRepository()
 	validatorServiceImpl := validator2.NewService(validatorInstance, engTranslator)
-	jobServiceImpl := job.NewService(repositoryImpl, userRepositoryImpl, categoryRepositoryImpl, job_resourceRepositoryImpl, dbConnection, fileStorage, googleMapsClient, user_addressRepositoryImpl, workerRepositoryImpl, validatorServiceImpl)
+	jobServiceImpl := job.NewService(repositoryImpl, userRepositoryImpl, categoryRepositoryImpl, job_resourceRepositoryImpl, dbConnection, fileStorage, googleMapsClient, user_addressRepositoryImpl, workerRepositoryImpl, validatorServiceImpl, nominatimHttpClient)
 	jobHandler := job.NewHandler(jobServiceImpl)
 	publicRoutes := ProvidePublicRoutes(ginRouterGroup, handler, jobHandler)
 	userServiceImpl := user.NewService(validatorServiceImpl, userRepositoryImpl, dbConnection, mailerService, identityProvider, viperConfig)

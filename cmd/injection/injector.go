@@ -170,6 +170,7 @@ func InitializeRoutes(
 	identityProvider *configs.IdentityProvider,
 	googleMapsClient *maps.Client,
 	midtransClient *snap.Client,
+	nominatimHttpClient *configs.HttpClient,
 ) (*routes.ApplicationRoutes, error) {
 	wire.Build(
 		wire.Struct(new(routes.ApplicationRoutes), "*"),

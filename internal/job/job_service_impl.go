@@ -1,10 +1,11 @@
 package job
 
 import (
-	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"go-takemikazuchi-api/configs"
 	"go-takemikazuchi-api/internal/category"
 	jobDto "go-takemikazuchi-api/internal/job/dto"
 	jobResourceFeature "go-takemikazuchi-api/internal/job_resource"
@@ -13,6 +14,7 @@ import (
 	userFeature "go-takemikazuchi-api/internal/user"
 	userDto "go-takemikazuchi-api/internal/user/dto"
 	userAddressFeature "go-takemikazuchi-api/internal/user_address"
+	"go-takemikazuchi-api/internal/user_address/dto"
 	validatorFeature "go-takemikazuchi-api/internal/validator"
 	"go-takemikazuchi-api/internal/worker"
 	"go-takemikazuchi-api/pkg/exception"
@@ -20,6 +22,7 @@ import (
 	"go-takemikazuchi-api/pkg/mapper"
 	"googlemaps.github.io/maps"
 	"gorm.io/gorm"
+	"io"
 	"mime/multipart"
 	"net/http"
 	"strconv"
@@ -36,6 +39,7 @@ type ServiceImpl struct {
 	mapsClient            *maps.Client
 	userAddressRepository userAddressFeature.Repository
 	workerRepository      worker.Repository
+	nominatimHttpClient   *configs.HttpClient
 }
 
 func NewService(
@@ -49,6 +53,7 @@ func NewService(
 	userAddressRepository userAddressFeature.Repository,
 	workerRepository worker.Repository,
 	validatorService validatorFeature.Service,
+	nominatimHttpClient *configs.HttpClient,
 ) *ServiceImpl {
 	return &ServiceImpl{
 		jobRepository:         jobRepository,
@@ -60,7 +65,8 @@ func NewService(
 		mapsClient:            mapsClient,
 		userAddressRepository: userAddressRepository,
 		validatorService:      validatorService,
-		workerRepository:      workerRepository}
+		workerRepository:      workerRepository,
+		nominatimHttpClient:   nominatimHttpClient}
 }
 
 func (jobService *ServiceImpl) HandleFindAll() []*jobDto.JobResponseDto {
@@ -84,13 +90,16 @@ func (jobService *ServiceImpl) HandleCreate(userJwtClaims *userDto.JwtClaimDto, 
 		var userAddress model.UserAddress
 		jobService.userRepository.FindUserByEmail(userJwtClaims.Email, &userModel, gormTransaction)
 		if createJobDto.AddressId == nil {
-			geoCodingRequest := &maps.GeocodingRequest{
-				LatLng: &maps.LatLng{Lat: createJobDto.Latitude, Lng: createJobDto.Longitude},
-			}
-			reverseGeocodingResponse, err := jobService.mapsClient.ReverseGeocode(context.Background(), geoCodingRequest)
-			helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrBadRequest, errors.New("bad request")))
-			mapper.MapReverseGeocodingIntoUserAddresses(&reverseGeocodingResponse[0], &userAddress, userModel.ID, createJobDto.AdditionalInformationAddress)
+			reverseResponse, err := jobService.nominatimHttpClient.HTTPClient.Get(fmt.Sprintf("%s/reverse?lat=%f&lon=%f&format=json", *jobService.nominatimHttpClient.BaseURL, createJobDto.Latitude, createJobDto.Longitude))
+			helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrBadRequest, errors.New("failed call reverse geocoding")))
+			responseBody, readErr := io.ReadAll(reverseResponse.Body)
+			helper.CheckErrorOperation(readErr, exception.NewClientError(http.StatusBadRequest, exception.ErrBadRequest, errors.New("failed call reverse geocoding")))
+			var userLocation dto.UserLocation
+			jsonErr := json.Unmarshal(responseBody, &userLocation)
+			helper.CheckErrorOperation(jsonErr, exception.NewClientError(http.StatusBadRequest, exception.ErrBadRequest, errors.New("failed call reverse geocoding")))
+			userAddress = mapper.MapLocationToUserAddress(userLocation, userModel.ID)
 			jobService.userAddressRepository.Store(gormTransaction, &userAddress)
+			helper.CheckErrorOperation(err, exception.ParseGormError(err))
 		} else {
 			jobService.userAddressRepository.FindById(gormTransaction, createJobDto.AddressId, &userAddress)
 		}
@@ -101,9 +110,11 @@ func (jobService *ServiceImpl) HandleCreate(userJwtClaims *userDto.JwtClaimDto, 
 		mapper.MapJobDtoIntoJobModel(createJobDto, &jobModel)
 		jobModel.UserId = userModel.ID
 		jobModel.AddressId = userAddress.ID
+		jobModel.WorkerId = nil
 		jobService.jobRepository.Store(&jobModel, gormTransaction)
 		uuidString := uuid.New().String()
 		var allFileName []string
+
 		for _, uploadedFile := range uploadedFiles {
 			openedFile, _ := uploadedFile.Open()
 			driverLicensePath := fmt.Sprintf("%s-%d-%s", uuidString, jobModel.ID, uploadedFile.Filename)
@@ -111,8 +122,11 @@ func (jobService *ServiceImpl) HandleCreate(userJwtClaims *userDto.JwtClaimDto, 
 			helper.CheckErrorOperation(err, exception.NewClientError(http.StatusBadRequest, exception.ErrBadRequest, errors.New("upload file failed")))
 			allFileName = append(allFileName, uploadedFile.Filename)
 		}
-		resourceModel := mapper.MapStringIntoJobResourceModel(jobModel.ID, allFileName)
-		jobService.jobResourceRepository.BulkCreate(gormTransaction, resourceModel)
+		if len(allFileName) != 0 {
+			resourceModel := mapper.MapStringIntoJobResourceModel(jobModel.ID, allFileName)
+			jobService.jobResourceRepository.BulkCreate(gormTransaction, resourceModel)
+
+		}
 		return nil
 	})
 	helper.CheckErrorOperation(err, exception.NewClientError(http.StatusInternalServerError, exception.ErrInternalServerError, err))
@@ -150,7 +164,6 @@ func (jobService *ServiceImpl) HandleUpdate(userJwtClaims *userDto.JwtClaimDto, 
 		}
 		return nil
 	})
-	fmt.Print(err)
 	helper.CheckErrorOperation(err, exception.ParseGormError(err))
 }
 
