@@ -7,6 +7,7 @@ SELECT * FROM jobs;
 SELECT * FROM job_resources;
 SELECT * FROM job_applications;
 SELECT * FROM worker_resources;
+SELECT * FROM workers;
 SELECT * FROM worker_wallets;
 SELECT * FROM user_addresses;
 SELECT * FROM users;

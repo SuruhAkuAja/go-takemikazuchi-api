@@ -66,9 +66,8 @@ func (protectedRoutes *ProtectedRoutes) Setup() {
 
 	jobApplicationRouterGroup := protectedRoutes.routerGroup.Group("job-applications")
 	jobApplicationRouterGroup.POST("", protectedRoutes.jobApplicationController.Apply)
-	jobApplicationRouterGroup.POST("/", protectedRoutes.jobApplicationController.SelectApplication)
-	jobApplicationRouterGroup.GET("/:jobId", protectedRoutes.jobApplicationController.FindAllApplication)
 	jobApplicationRouterGroup.POST("/select", protectedRoutes.jobApplicationController.SelectApplication)
+	jobApplicationRouterGroup.GET("/:jobId", protectedRoutes.jobApplicationController.FindAllApplication)
 
 	transactionRouterGroup := protectedRoutes.routerGroup.Group("transactions")
 	transactionRouterGroup.POST("", protectedRoutes.transactionController.Create)
