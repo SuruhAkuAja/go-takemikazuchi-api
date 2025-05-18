@@ -44,6 +44,15 @@ func (jobApplicationRepository *RepositoryImpl) FindById(gormTransaction *gorm.D
 	return &jobApplication
 }
 
+func (jobApplicationRepository *RepositoryImpl) FindByApplicantId(gormTransaction *gorm.DB, id *uint64, applicantId *uint64) *model.JobApplication {
+	var jobApplication model.JobApplication
+	err := gormTransaction.
+		Where("job_id = ? AND applicant_id = ?", applicantId, id).
+		First(&jobApplication).Error
+	helper.CheckErrorOperation(err, exception.ParseGormError(err))
+	return &jobApplication
+}
+
 func (jobApplicationRepository *RepositoryImpl) Update(gormTransaction *gorm.DB, jobApplicationModel *model.JobApplication) {
 	err := gormTransaction.
 		Where("id = ?", jobApplicationModel.ID).

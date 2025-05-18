@@ -69,9 +69,7 @@ func MapSingleJobModelIntoSingleJobResponseDto(jobModel *model.Job) *dto.JobResp
 	jobResponse.Status = jobModel.Status
 	jobResponse.CreatedAt = jobModel.CreatedAt.Format(time.RFC3339)
 	jobResponse.UpdatedAt = jobModel.UpdatedAt.Format(time.RFC3339)
-	fmt.Println("Before Mapping User")
 	jobResponse.User = MapUserModelIntoUserDto(jobModel.User)
-	fmt.Println("Before Mapping User Address")
 	jobResponse.UserAddress = MapUserAddressModelIntoUserAddressDto(jobModel.UserAddress)
 	if jobModel.Worker != nil {
 		fmt.Println("Before Mapping Worker")

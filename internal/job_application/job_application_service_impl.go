@@ -10,6 +10,7 @@ import (
 	userFeature "go-takemikazuchi-api/internal/user"
 	userDto "go-takemikazuchi-api/internal/user/dto"
 	validatorFeature "go-takemikazuchi-api/internal/validator"
+	workerFeature "go-takemikazuchi-api/internal/worker"
 	"go-takemikazuchi-api/pkg/exception"
 	"go-takemikazuchi-api/pkg/helper"
 	"go-takemikazuchi-api/pkg/mapper"
@@ -24,6 +25,7 @@ type ServiceImpl struct {
 	dbConnection             *gorm.DB
 	jobRepository            job.Repository
 	userRepository           userFeature.Repository
+	workerRepository         workerFeature.Repository
 }
 
 func NewService(
@@ -34,6 +36,7 @@ func NewService(
 	jobRepository job.Repository,
 	userRepository userFeature.Repository,
 	validatorService validatorFeature.Service,
+	workerRepository workerFeature.Repository,
 ) *ServiceImpl {
 	return &ServiceImpl{
 		validatorService:         validatorService,
@@ -41,6 +44,7 @@ func NewService(
 		dbConnection:             dbConnection,
 		jobRepository:            jobRepository,
 		userRepository:           userRepository,
+		workerRepository:         workerRepository,
 	}
 }
 
@@ -88,8 +92,11 @@ func (jobApplicationService *ServiceImpl) SelectApplication(userJwtClaims *userD
 		jobApplicationModel := jobApplicationService.jobApplicationRepository.FindById(gormTransaction, &selectApplicationDto.Id, &selectApplicationDto.JobId)
 		id, err := jobApplicationService.jobRepository.FindVerifyById(gormTransaction, userJwtClaims.Email, &selectApplicationDto.JobId)
 		helper.CheckErrorOperation(err, exception.ParseGormError(err))
+		workerModel, err := jobApplicationService.workerRepository.FindById(gormTransaction, &jobApplicationModel.ApplicantId)
+		helper.CheckErrorOperation(err, exception.ParseGormError(err))
 		jobModel := id
 		jobModel.Status = "Process"
+		jobModel.WorkerId = &workerModel.ID
 		jobApplicationModel.Status = "Accepted"
 		jobApplicationService.jobApplicationRepository.BulkRejectUpdate(gormTransaction, &jobModel.ID)
 		jobApplicationService.jobApplicationRepository.Update(gormTransaction, jobApplicationModel)

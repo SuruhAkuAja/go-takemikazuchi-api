@@ -63,7 +63,7 @@ func (transactionService *ServiceImpl) Create(userJwtClaims *userDto.JwtClaimDto
 	exception.ParseValidationError(err, transactionService.engTranslator)
 	err = transactionService.gormTransaction.Transaction(func(gormTransaction *gorm.DB) error {
 		jobModel := transactionService.jobRepository.FindWithRelationship(gormTransaction, userJwtClaims.Email, &createTransactionDto.JobId)
-		jobApplicationModel := transactionService.jobApplicationRepository.FindById(gormTransaction, &createTransactionDto.ApplicantId, &createTransactionDto.JobId)
+		jobApplicationModel := transactionService.jobApplicationRepository.FindByApplicantId(gormTransaction, &createTransactionDto.ApplicantId, &createTransactionDto.JobId)
 		uuidString := fmt.Sprintf("%s-%s", "order", uuid.New().String())
 		var transactionModel model.Transaction
 		transactionModel.ID = uuidString

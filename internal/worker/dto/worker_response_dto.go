@@ -1,6 +1,8 @@
 package dto
 
 type WorkerResponseDto struct {
+	ID                   uint64  `json:"id"`
+	UserId               uint64  `json:"user_id"`
 	Rating               float32 `json:"rating"`
 	Revenue              uint32  `json:"revenue"`
 	CompletedJobs        uint32  `json:"completed_jobs"`

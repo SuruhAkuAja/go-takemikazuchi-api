@@ -57,7 +57,7 @@ func InitializeRoutes(ginRouterGroup *gin.RouterGroup, dbConnection *gorm.DB, va
 	authenticationRoutes := ProvideAuthenticationRoutes(ginRouterGroup, userHandler)
 	categoryServiceImpl := category.NewService(categoryRepositoryImpl, dbConnection, validatorServiceImpl)
 	categoryHandler := category.NewHandler(categoryServiceImpl)
-	job_applicationServiceImpl := job_application.NewService(validatorInstance, engTranslator, job_applicationRepositoryImpl, dbConnection, repositoryImpl, userRepositoryImpl, validatorServiceImpl)
+	job_applicationServiceImpl := job_application.NewService(validatorInstance, engTranslator, job_applicationRepositoryImpl, dbConnection, repositoryImpl, userRepositoryImpl, validatorServiceImpl, workerRepositoryImpl)
 	job_applicationHandler := job_application.NewHandler(job_applicationServiceImpl)
 	worker_walletRepositoryImpl := worker_wallet.NewRepository()
 	worker_resourceRepositoryImpl := worker_resource.NewRepository()
